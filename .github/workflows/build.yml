@@ -1,0 +1,29 @@
+
+name: Build and Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - shell: pwsh
+        run: |
+          nuget install Microsoft.DXSDK.D3DX -Version 9.29.952.8 -OutputDirectory .
+          $dx = "Microsoft.DXSDK.D3DX.9.29.952.8\build\native"
+          cl /nologo /LD /O2 /EHsc /I"$dx\include" deltabest_plugin\rFplugin.cpp /link /OUT:deltabest.dll /LIBPATH:"$dx\release\lib\x86" d3dx9.lib d3d9.lib
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          files: deltabest.dll
