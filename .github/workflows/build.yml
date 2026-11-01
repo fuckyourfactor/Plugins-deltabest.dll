@@ -21,8 +21,8 @@ jobs:
         run: |
           nuget install Microsoft.DXSDK.D3DX -Version 9.29.952.8 -OutputDirectory .
           $dx = "Microsoft.DXSDK.D3DX.9.29.952.8\build\native"
-          cl /nologo /LD /O2 /EHsc /I"$dx\include" deltabest_plugin\rFplugin.cpp /link /OUT:deltabest.dll /LIBPATH:"$dx\release\lib\x86" d3dx9.lib d3d9.lib
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cl /nologo /LD /O2 /EHsc /I"$dx\include" deltabest_plugin\rFplugin.cpp /link /OUT:deltabest.dll /LIBPATH:"$dx\release\lib\x86" d3dx9.lib d3d9.lib user32.lib
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
